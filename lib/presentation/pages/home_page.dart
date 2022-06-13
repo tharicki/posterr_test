@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:strider/data/models/post.dart';
+import 'package:strider/data/models/user.dart';
 import 'package:strider/presentation/bloc/home/home_bloc.dart';
+import 'package:strider/presentation/bloc/user/user_bloc.dart';
+import 'package:strider/presentation/pages/new_post_page.dart';
 import 'package:strider/presentation/pages/user_page.dart';
 import 'package:strider/shared/app_theme.dart';
 import 'package:strider/shared/components/post_card_view.dart';
@@ -17,6 +20,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final HomeBloc homeBloc = HomeBloc();
+  final UserBloc userBloc = UserBloc();
+
+  late List<Post> myPosts;
 
   @override
   Widget build(BuildContext context) {
@@ -28,31 +34,39 @@ class _HomePageState extends State<HomePage> {
       ),
       body: BlocBuilder<HomeBloc, HomeState>(
         bloc: homeBloc..add(OnLoadHome()),
-          builder: ((context, state) {
-            if (state is HomeSucess) {
-
-              List<Post> myPosts = state.posts;
-              return Container(
-                margin: const EdgeInsets.all(4),
-                child: ListView(
-                  children: _postsCards(myPosts),
-                ),
-              );
-            }
-
-            return const SizedBox(
-              height: 500.0,
-              child: Center(
-                child: CircularProgressIndicator(
-                  color: Colors.grey,
-                ),
+        builder: ((context, state) {
+          if (state is HomeSucess) {
+            myPosts = state.posts;
+            return Container(
+              margin: const EdgeInsets.all(4),
+              child: ListView(
+                children: _postsCards(myPosts),
               ),
             );
-          }),
+          }
+
+          return const SizedBox(
+            height: 500.0,
+            child: Center(
+              child: CircularProgressIndicator(
+                color: Colors.grey,
+              ),
+            ),
+          );
+        }),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppTheme.theme.primaryColor,
-        onPressed: () {},
+        onPressed: () {
+          //here we should have the user data on our bloc to pass as parameter
+          Nav.push(
+              context,
+              NewPostPage(
+                  author: User(id: 1),
+                  callback: () {
+                    setState(() {});
+                  }));
+        },
         child: const Icon(Icons.add),
       ),
       drawer: Drawer(
@@ -73,13 +87,13 @@ class _HomePageState extends State<HomePage> {
             ListTile(
               title: const Text('Home'),
               onTap: () {
-                Nav.push(context, const HomePage(), replace: true);
+                Nav.push(context, const HomePage());
               },
             ),
             ListTile(
               title: const Text('Profile'),
               onTap: () {
-                Nav.push(context, UserPage());
+                Nav.push(context, const UserPage());
               },
             ),
           ],
@@ -95,8 +109,11 @@ class _HomePageState extends State<HomePage> {
     cardsPosts.add(QuotedPostCard(post: posts[1], quotedPost: posts[3]));
 
     //repost post
-    cardsPosts.add(PostCard(post: posts[0],
-        isRepost: true, isQuote: true, repostAuthor: posts[1].author));
+    cardsPosts.add(PostCard(
+        post: posts[0],
+        isRepost: true,
+        isQuote: true,
+        repostAuthor: posts[1].author));
 
     //other regular posts
     for (var element in posts) {

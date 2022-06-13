@@ -98,4 +98,9 @@ class MockData {
     return myPosts;
   }
 
+  Future<void> newPost(Post post) async {
+    await Future.delayed(const Duration(milliseconds: 1500), () {});
+    posts.add(post);
+  }
+
 }

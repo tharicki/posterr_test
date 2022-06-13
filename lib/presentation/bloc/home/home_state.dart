@@ -19,6 +19,8 @@ class HomeProfileSucess extends HomeState {
   HomeProfileSucess({required this.posts});
 }
 
+class NewPostSuccess extends HomeState {}
+
 class HomeFailed extends HomeState {
   final String error;
 

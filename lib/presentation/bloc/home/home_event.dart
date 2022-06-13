@@ -8,6 +8,11 @@ class OnLoadHome extends HomeEvent {
 }
 
 class OnLoadProfile extends HomeEvent {
-  int userId;
+  final int userId;
   OnLoadProfile({required this.userId});
+}
+
+class OnNewPost extends HomeEvent {
+  final Post post;
+  OnNewPost({required this.post});
 }

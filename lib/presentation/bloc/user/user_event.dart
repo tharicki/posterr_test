@@ -4,6 +4,6 @@ part of 'user_bloc.dart';
 abstract class UserEvent {}
 
 class OnLoadUser extends UserEvent {
-  int id;
+  final int id;
   OnLoadUser({required this.id});
 }
