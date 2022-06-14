@@ -7,10 +7,10 @@ class HomeInitial extends HomeState {}
 
 class HomeLoading extends HomeState {}
 
-class HomeSucess extends HomeState {
+class HomeSuccess extends HomeState {
   final List<Post> posts;
 
-  HomeSucess({required this.posts});
+  HomeSuccess({required this.posts});
 }
 
 class HomeProfileSucess extends HomeState {

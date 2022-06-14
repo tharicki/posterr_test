@@ -5,8 +5,15 @@ import 'package:strider/shared/components/post_card_view.dart';
 class QuotedPostCard extends StatelessWidget {
   final Post post;
   final Post quotedPost;
+  final Function? onRepostTap;
+  final Function? onQuoteTap;
 
-  const QuotedPostCard({Key? key, required this.post, required this.quotedPost})
+  const QuotedPostCard(
+      {Key? key,
+      required this.post,
+      required this.quotedPost,
+      this.onRepostTap,
+      this.onQuoteTap})
       : super(key: key);
 
   @override
@@ -56,7 +63,7 @@ class QuotedPostCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 6),
-            PostCard(post: quotedPost, isRepost: false, isQuote: false),
+            PostCard(post: quotedPost),
             const SizedBox(height: 6),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -73,7 +80,7 @@ class QuotedPostCard extends StatelessWidget {
                     ],
                   ),
                   onTap: () {
-                    showAboutDialog(context: context);
+                    onRepostTap;
                   },
                 ),
                 const SizedBox(width: 20),
@@ -89,7 +96,7 @@ class QuotedPostCard extends StatelessWidget {
                     ],
                   ),
                   onTap: () {
-                    showAboutDialog(context: context);
+                    onQuoteTap;
                   },
                 ),
               ],

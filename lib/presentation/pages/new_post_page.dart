@@ -3,6 +3,7 @@ import 'package:strider/data/models/post.dart';
 import 'package:strider/data/models/user.dart';
 import 'package:strider/presentation/bloc/home/home_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:strider/shared/components/alert_dialog.dart';
 import 'package:strider/shared/utils/navigator.dart';
 
 typedef PostCallback = Function();
@@ -34,6 +35,8 @@ class NewPostPage extends StatelessWidget {
                   newPost = Post(
                       description: _postController.text,
                       dateTime: DateTime.now(),
+                      isRepost: false,
+                      isQuote: false,
                       author: author);
 
                   homeBloc.add(OnNewPost(post: newPost));
@@ -46,6 +49,16 @@ class NewPostPage extends StatelessWidget {
             if (state is NewPostSuccess) {
               callback.call();
               Nav.pop(context);
+            }
+            if (state is HomeFailed) {
+              showCustomAlertDialog(
+                  context: context,
+                  title: "Sorry, you can't post this!",
+                  text:
+                      "You already posted five times today, come back tomorrow!",
+                  confirmButtonTap: () {
+                    Nav.pop(context);
+                  });
             }
           },
           child: BlocBuilder<HomeBloc, HomeState>(

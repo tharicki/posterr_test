@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:strider/data/mock_data.dart';
 import 'package:strider/data/models/post.dart';
 import 'package:strider/data/models/user.dart';
 import 'package:strider/presentation/bloc/home/home_bloc.dart';
@@ -6,6 +7,7 @@ import 'package:strider/presentation/bloc/user/user_bloc.dart';
 import 'package:strider/presentation/pages/new_post_page.dart';
 import 'package:strider/presentation/pages/user_page.dart';
 import 'package:strider/shared/app_theme.dart';
+import 'package:strider/shared/components/alert_dialog.dart';
 import 'package:strider/shared/components/post_card_view.dart';
 import 'package:strider/shared/components/quoted_post_card_view.dart';
 import 'package:strider/shared/utils/navigator.dart';
@@ -35,7 +37,7 @@ class _HomePageState extends State<HomePage> {
       body: BlocBuilder<HomeBloc, HomeState>(
         bloc: homeBloc..add(OnLoadHome()),
         builder: ((context, state) {
-          if (state is HomeSucess) {
+          if (state is HomeSuccess) {
             myPosts = state.posts;
             return Container(
               margin: const EdgeInsets.all(4),
@@ -105,21 +107,65 @@ class _HomePageState extends State<HomePage> {
   List<Widget> _postsCards(List<Post> posts) {
     List<Widget> cardsPosts = [];
 
-    // quoted post
-    cardsPosts.add(QuotedPostCard(post: posts[1], quotedPost: posts[3]));
+    for (var post in posts) {
+      if (post.isQuote!) {
+        post.quotePost = posts[1];
+        post.quotePost!.isQuote = true;
 
-    //repost post
-    cardsPosts.add(PostCard(
-        post: posts[0],
-        isRepost: true,
-        isQuote: true,
-        repostAuthor: posts[1].author));
-
-    //other regular posts
-    for (var element in posts) {
-      cardsPosts.add(PostCard(post: element));
+        cardsPosts.add(QuotedPostCard(post: post, quotedPost: post.quotePost!));
+      } else {
+        cardsPosts.add(PostCard(post: post, onRepostTap: () {
+          repost(post);
+        }, onQuoteTap: () {
+          quote(post);
+        },));
+      }
     }
 
     return cardsPosts;
+  }
+
+  void repost(Post post) {
+    showCustomAlertDialog(
+        context: context,
+        title: "Confirm this action",
+        text: "Do you want to repost this?",
+        confirmButtonTap: () {
+          Post newPost = Post();
+          newPost.description = post.description;
+          newPost.isQuote = post.isQuote;
+          newPost.quotePost = post.quotePost;
+          newPost.author = post.author;
+          newPost.isRepost = true;
+
+          homeBloc.add(OnNewPost(post: newPost));
+
+          setState((){});
+        });
+  }
+
+  void quote(Post post) {
+    final TextEditingController postController = TextEditingController();
+    showCustomAlertDialog(
+        context: context,
+        title: "Insert your message to quote this post",
+        text: "",
+        textField: TextField(
+          onChanged: (value) { },
+          controller: postController,
+          decoration: const InputDecoration(hintText: "Quote message"),
+        ),
+        confirmButtonTap: () {
+          Post newPost = Post();
+          newPost.description = postController.text;
+          newPost.isQuote = true;
+          newPost.quotePost = post.quotePost;
+          newPost.author = post.author;
+          newPost.isRepost = false;
+
+          homeBloc.add(OnNewPost(post: newPost));
+
+          setState((){});
+        });
   }
 }

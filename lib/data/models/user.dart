@@ -7,6 +7,7 @@ class User {
   int? postsCount;
   int? repostsCount;
   int? quotedCount;
+  int? dayPosts;
 
   User({
     this.id,
@@ -17,5 +18,6 @@ class User {
     this.postsCount,
     this.repostsCount,
     this.quotedCount,
+    this.dayPosts
   });
 }

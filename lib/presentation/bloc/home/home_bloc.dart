@@ -19,7 +19,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         try {
           List<Post> posts = await mockData.getPosts();
 
-          emit(HomeSucess(posts: posts));
+          emit(HomeSuccess(posts: posts));
         } catch(e) {
           emit(HomeFailed(error: "error on load posts"));
         }
@@ -37,12 +37,23 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         try {
           emit(HomeLoading());
 
+          if (mockData.getDayPosts() == 5) {
+            emit(HomeFailed(error: "Max posts of day already archived"));
+            return;
+          }
+
           Post post = event.post;
           User author = await mockData.getUserById(post.author!.id!);
 
-          post.author = author;
+          mockData.incrementDayPosts();
 
-          await mockData.newPost(event.post);
+          if (!post.isRepost!) {
+            post.author = author;
+          } else {
+            post.repostAuthor = author;
+          }
+
+          await mockData.newPost(post);
 
           emit(NewPostSuccess());
         } catch(e) {

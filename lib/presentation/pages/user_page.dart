@@ -7,7 +7,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:strider/presentation/pages/new_post_page.dart';
 import 'package:strider/shared/app_theme.dart';
+import 'package:strider/shared/components/alert_dialog.dart';
 import 'package:strider/shared/components/post_card_view.dart';
+import 'package:strider/shared/components/quoted_post_card_view.dart';
 import 'package:strider/shared/utils/navigator.dart';
 
 class UserPage extends StatefulWidget {
@@ -22,12 +24,6 @@ class _UserPageState extends State<UserPage> {
   final HomeBloc homeBloc = HomeBloc();
 
   late List<Post> myPosts;
-
-  @override
-  void initState() {
-    homeBloc.add(OnLoadProfile(userId: 1));
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,10 +64,14 @@ class _UserPageState extends State<UserPage> {
                     ),
                   ),
                   const SizedBox(height: 10),
+                  //validate to show only 14 characters of name
                   Text(
-                    myUser.name!,
+                    myUser.name!.length > 14
+                        ? '${myUser.name!.substring(0, 13)}...'
+                        : myUser.name!,
                     style: const TextStyle(
                         fontSize: 28, fontWeight: FontWeight.w600),
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 5),
                   Row(
@@ -98,7 +98,7 @@ class _UserPageState extends State<UserPage> {
                   const Divider(height: 5, color: Colors.grey),
                   const SizedBox(height: 5),
                   BlocBuilder<HomeBloc, HomeState>(
-                    bloc: homeBloc,
+                    bloc: homeBloc..add(OnLoadProfile(userId: 1)),
                     builder: ((context, state) {
                       if (state is HomeProfileSucess) {
                         myPosts = state.posts;
@@ -137,22 +137,66 @@ class _UserPageState extends State<UserPage> {
   List<Widget> _postsCards(List<Post> myPosts) {
     List<Widget> cardsPosts = [];
 
-    //repost post
-    cardsPosts.add(PostCard(
-        post: myPosts[0],
-        isRepost: true,
-        isQuote: true,
-        repostAuthor: myPosts[1].author));
+    for (var post in myPosts) {
+      if (post.isQuote!) {
+        post.quotePost = myPosts[1];
+        post.quotePost!.isQuote = true;
 
-    //other regular posts
-    for (var element in myPosts) {
-      cardsPosts.add(PostCard(post: element));
+        cardsPosts.add(QuotedPostCard(post: post, quotedPost: post.quotePost!));
+      } else {
+        cardsPosts.add(PostCard(post: post, onRepostTap: () {
+          repost(post);
+        }, onQuoteTap: () {
+          quote(post);
+        },));
+      }
     }
 
     return cardsPosts;
   }
 
-  void _refresh() async {
-    homeBloc.add(OnLoadProfile(userId: 1));
+  void repost(Post post) {
+    showCustomAlertDialog(
+        context: context,
+        title: "Confirm this action",
+        text: "Do you want to repost this?",
+        confirmButtonTap: () {
+          Post newPost = Post();
+          newPost.description = post.description;
+          newPost.isQuote = post.isQuote;
+          newPost.quotePost = post.quotePost;
+          newPost.author = post.author;
+          newPost.isRepost = true;
+
+
+          homeBloc.add(OnNewPost(post: newPost));
+
+          setState((){});
+        });
+  }
+
+  void quote(Post post) {
+    final TextEditingController postController = TextEditingController();
+    showCustomAlertDialog(
+        context: context,
+        title: "Insert your message to quote this post",
+        text: "",
+        textField: TextField(
+          onChanged: (value) { },
+          controller: postController,
+          decoration: const InputDecoration(hintText: "Quote message"),
+        ),
+        confirmButtonTap: () {
+          Post newPost = Post();
+          newPost.description = postController.text;
+          newPost.isQuote = true;
+          newPost.quotePost = post.quotePost;
+          newPost.author = post.author;
+          newPost.isRepost = false;
+
+          homeBloc.add(OnNewPost(post: newPost));
+
+          setState((){});
+        });
   }
 }

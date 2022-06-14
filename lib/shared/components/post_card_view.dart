@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:strider/data/models/post.dart';
-import 'package:strider/data/models/user.dart';
 
 class PostCard extends StatelessWidget {
   final Post post;
-  final bool? isRepost;
-  final bool? isQuote;
-  final User? repostAuthor;
+  final Function? onRepostTap;
+  final Function? onQuoteTap;
 
   const PostCard(
       {Key? key,
       required this.post,
-      this.isRepost,
-      this.isQuote,
-      this.repostAuthor})
+      this.onRepostTap,
+      this.onQuoteTap})
       : super(key: key);
 
   @override
@@ -26,7 +23,7 @@ class PostCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Visibility(
-              visible: isRepost != null && isRepost == true,
+              visible: post.isRepost != null && post.isRepost == true,
               child: Row(
                 children: [
                   const Icon(
@@ -35,7 +32,7 @@ class PostCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    repostAuthor != null ? repostAuthor!.name! : "",
+                    post.repostAuthor != null ? post.repostAuthor!.name! : "",
                     style: TextStyle(color: Colors.grey[600], fontSize: 13),
                   ),
                   Text("'s",
@@ -87,7 +84,7 @@ class PostCard extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Visibility(
-              visible: isQuote == null || isQuote == true,
+              visible: post.isQuote != true,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -102,9 +99,7 @@ class PostCard extends StatelessWidget {
                         Text("Repost"),
                       ],
                     ),
-                    onTap: () {
-                      showAboutDialog(context: context);
-                    },
+                    onTap: () => onRepostTap!(),
                   ),
                   const SizedBox(width: 20),
                   InkWell(
@@ -118,9 +113,7 @@ class PostCard extends StatelessWidget {
                         Text("Quote")
                       ],
                     ),
-                    onTap: () {
-                      showAboutDialog(context: context);
-                    },
+                    onTap: () => onQuoteTap!(),
                   ),
                 ],
               ),
