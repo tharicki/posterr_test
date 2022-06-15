@@ -1,5 +1,5 @@
 # posterr_test
-Test for Strider
+App for assessment purpose developed by Tháricki Pereira using Flutter.
 
 # Critique
 * Improvment
