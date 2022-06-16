@@ -63,7 +63,7 @@ class QuotedPostCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 6),
-            PostCard(post: quotedPost),
+            PostCard(post: quotedPost, hideActionButtons: true),
             const SizedBox(height: 6),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,

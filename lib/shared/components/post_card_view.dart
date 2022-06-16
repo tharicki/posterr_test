@@ -5,12 +5,14 @@ class PostCard extends StatelessWidget {
   final Post post;
   final Function? onRepostTap;
   final Function? onQuoteTap;
+  final bool? hideActionButtons;
 
   const PostCard(
       {Key? key,
       required this.post,
       this.onRepostTap,
-      this.onQuoteTap})
+      this.onQuoteTap,
+      this.hideActionButtons})
       : super(key: key);
 
   @override
@@ -84,7 +86,7 @@ class PostCard extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Visibility(
-              visible: post.isQuote != true,
+              visible: hideActionButtons == null || hideActionButtons == false,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

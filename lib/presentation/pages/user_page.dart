@@ -103,7 +103,7 @@ class _UserPageState extends State<UserPage> {
                       if (state is HomeProfileSucess) {
                         myPosts = state.posts;
                         return Column(
-                          children: _postsCards(myPosts),
+                          children: _postsCards(myPosts.reversed.toList()),
                         );
                       }
 

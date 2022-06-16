@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> {
             return Container(
               margin: const EdgeInsets.all(4),
               child: ListView(
-                children: _postsCards(myPosts),
+                children: _postsCards(myPosts.reversed.toList()),
               ),
             );
           }
@@ -110,7 +110,6 @@ class _HomePageState extends State<HomePage> {
     for (var post in posts) {
       if (post.isQuote!) {
         post.quotePost = posts[1];
-        post.quotePost!.isQuote = true;
 
         cardsPosts.add(QuotedPostCard(post: post, quotedPost: post.quotePost!));
       } else {
